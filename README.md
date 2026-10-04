@@ -215,9 +215,43 @@ This gives the CRT a native 240p mode.
 
 ## 7. Position the CRT
 
-Once the CRT is working, position it however you want using your desktop display settings or `xrandr`.
+The CRT needs a position inside your X11 desktop layout.
 
-The exact coordinates depend on your monitor layout, so they are not included here.
+Use:
+
+```bash
+xrandr
+```
+
+to see your monitor names and current layout.
+
+For example, if your main monitor is 3440x1440 and you want the CRT to the left and bottom-aligned:
+
+### 480i
+
+```bash
+xrandr \
+--output VGA-1-1 --mode "640x480i-test" --pos 0x960 \
+--output HDMI-0 --primary --mode 3440x1440 --pos 640x0
+```
+
+### 240p
+
+```bash
+xrandr \
+--output VGA-1-1 --mode "320x240p" --pos 0x1200 \
+--output HDMI-0 --primary --mode 3440x1440 --pos 320x0
+```
+
+These are only example coordinates.
+
+Change the output names, resolutions, and positions to match your own monitor setup.
+
+### Why
+
+XRandR treats all connected displays as one large desktop.
+
+The `--pos` values control where each display sits inside that desktop.
 
 ---
 
@@ -225,10 +259,13 @@ The exact coordinates depend on your monitor layout, so they are not included he
 
 Custom XRandR modes do not survive a reboot, so this script recreates the 480i mode and enables the CRT.
 
+Edit the `MAIN`, `CRT`, and position values to match your own setup.
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
+MAIN="HDMI-0"
 CRT="VGA-1-1"
 MODE="640x480i-test"
 
@@ -244,17 +281,23 @@ xrandr --rmmode "$MODE" 2>/dev/null || true
 
 xrandr --newmode "$MODE" "${MODELINE[@]}"
 xrandr --addmode "$CRT" "$MODE"
-xrandr --output "$CRT" --mode "$MODE"
+
+xrandr \
+    --output "$CRT" --mode "$MODE" --pos 0x960 \
+    --output "$MAIN" --primary --pos 640x0
 ```
 
 ---
 
 ## 9. 240p Script
 
+Edit the `MAIN`, `CRT`, and position values to match your own setup.
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
+MAIN="HDMI-0"
 CRT="VGA-1-1"
 MODE="320x240p"
 
@@ -270,7 +313,10 @@ xrandr --rmmode "$MODE" 2>/dev/null || true
 
 xrandr --newmode "$MODE" "${MODELINE[@]}"
 xrandr --addmode "$CRT" "$MODE"
-xrandr --output "$CRT" --mode "$MODE"
+
+xrandr \
+    --output "$CRT" --mode "$MODE" --pos 0x1200 \
+    --output "$MAIN" --primary --pos 320x0
 ```
 
 ---
@@ -280,7 +326,9 @@ xrandr --output "$CRT" --mode "$MODE"
 ```bash
 #!/usr/bin/env bash
 
-xrandr --output VGA-1-1 --off
+xrandr \
+--output VGA-1-1 --off \
+--output HDMI-0 --primary --pos 0x0
 ```
 
 ---
@@ -292,14 +340,17 @@ You may need to change:
 - GPU PCI address
 - Xorg BusID
 - CRT output name
+- main monitor output name
+- display positions
 
 My setup uses:
 
 ```text
 R7 240 PCI address: 11:00.0
-Xorg BusID: PCI:17:0:0
-CRT output: VGA-1-1
-CRT: Toshiba 14AF44
+Xorg BusID:         PCI:17:0:0
+CRT output:         VGA-1-1
+Main output:        HDMI-0
+CRT:                Toshiba 14AF44
 ```
 
 > [!WARNING]
