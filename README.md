@@ -2,12 +2,22 @@
 
 This is how I got a consumer CRT working as a second display on Linux Mint/X11 using an AMD Radeon R7 240 for analog VGA output.
 
-My setup:
+## Hardware Used
+
+- AMD Radeon R7 240 with VGA output
+- Consumer CRT with component input
+- [Wakabavideo RGB VGA to YPbPr Component transcoder](https://www.ebay.com/itm/174166352619)
+- VGA cable
+- Component video cables
+
+My signal chain is:
 
 ```text
-NVIDIA GPU → main monitor
-AMD R7 240 → VGA → transcoder → component → CRT
-```
+R7 240 VGA
+→ VGA cable
+→ Wakabavideo RGB VGA to YPbPr transcoder
+→ Component cables
+→ CRT
 
 The CRT modes I use are:
 
